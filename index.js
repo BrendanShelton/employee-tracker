@@ -11,13 +11,21 @@ const db = mysql.createConnection(
     password: 'root',
     database: 'employees_db'
   },
-  console.log(`Connected to the books_db database.`)
+  console.log(`Connected to the employees_db database.`)
 );
 
-const employees = []
-/*db.query('SELECT * FROM employee', function (err, results) {
-  console.log(results);
-});*/
+let employees;
+db.query('SELECT * FROM employee', function (err, results) {
+  //console.table(results);
+  employees = results.map(employeeObj => {
+    return employeeObj.first_name + " " + employeeObj.last_name
+  })
+  console.log(employees)
+  console.log(employees[0])
+  init()
+});
+
+
 
 const questions = [{
     type: 'list',
@@ -93,12 +101,38 @@ function handleResponse(response) {
   console.log(response)
   switch(response.option) {
     case "view all departments":
-      console.log("department chosen")
+      //console.log("department chosen")
+      db.query('SELECT * FROM department', function (err, results) {
+        console.table(results);
+      })
+      //init()
       break;
-    case "":
 
-    case "":
+    case "view all roles":
+      //console.log("")
+      db.query('SELECT * FROM role JOIN department ON role.department_id = department.id', function (err, results) {
+        console.table(results);
+      })
+      break;
+      
+    case "view all employees":
+      //console.log("")
+      db.query('SELECT * FROM employee JOIN role ON employee.role_id = role.id', function (err, results) {
+        console.table(results);
+      })
+      break;
+
+    case "add a department":
+      console.log("add a department chosen")
+      db.query(`INSERT INTO department(name) VALUES (?),`, response.department, function (err, results) {
+        if (err) {
+          console.log(err);
+        }
+        console.table(results);
+      })
+      break;
+    default:
   }
 }
 
-init()
+//init()
